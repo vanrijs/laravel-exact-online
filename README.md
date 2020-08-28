@@ -9,21 +9,15 @@ your platform need access to Exact Online for a single user! This set of code ma
 a single Exact Online user's administration.
 
 ## Installation
-First add the dev-master version of this package to your composer.json
+Require the package
 
 ```
-"websmurf/laravel-exact-online": "dev-master"
+composer require websmurf/laravel-exact-online
 ```
 
-Then run `composer update` and add the Service Provider to config/app.php (For L5.5 and up Auto-Discovery is enabled)
+Because of the auto package discovery feature Laravel > 5.5 has, the ServiceProvider and Facades are automatically registered.
 
-```
-...
-Websmurf\LaravelExactOnline\Providers\LaravelExactOnlineServiceProvider::class,
-...
-```
-
-In the same file, add the Facade
+Add the Facade to your config/app.php
 
 ```
 ...
