@@ -8,11 +8,6 @@ to the API easily. Authorisation and refresh tokens are saved automatically.
 your platform need access to Exact Online for a single user! This set of code may be used to communicate with
 a single Exact Online user's administration.
 
-#### First draft - do not use!
-So far, this package is just a draft. So use at own risk. We're currently working on a project to see if
-it provides all functions we need. If you intend to use this package, please see below for instructions and
-what functions you may use.
-
 ## Installation
 First add the dev-master version of this package to your composer.json
 
