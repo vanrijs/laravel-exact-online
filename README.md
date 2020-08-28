@@ -169,6 +169,7 @@ ExactOnline::connectionSetBaseUrl('http://start.exactonline.de')
 ## Credits
 
 - [Picqer/exact-php-client](https://github.com/picqer/exact-php-client)
+- [PendoNL/laravel-exact-online](https://github.com/PendoNL/laravel-exact-online)
 
 ## Security
 
