@@ -1,47 +1,48 @@
 {
-    "name": "websmurf/laravel-exact-online",
-    "description": "Laravel Facade wrapper for Exact Online PHP API",
-    "require": {
-        "picqer/exact-php-client": "^3.1"
+  "name": "websmurf/laravel-exact-online",
+  "description": "Laravel Facade wrapper for Exact Online PHP API",
+  "require": {
+    "picqer/exact-php-client": "^3.1",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "laravel/framework": "^7.0",
+    "phpunit/phpunit": "~8.0"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Adam van Dongen",
+      "email": "adam@bandhosting.nl"
     },
-    "require-dev": {
-        "laravel/framework": "^7.0",
-        "phpunit/phpunit": "~8.0"
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Adam van Dongen",
-            "email": "adam@bandhosting.nl"
-        },
-        {
-            "name": "Joshua de Gier",
-            "email": "info@pendo.nl"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "Websmurf\\LaravelExactOnline\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Websmurf\\LaravelExactOnline\\Test\\": "tests"
-        }
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Websmurf\\LaravelExactOnline\\Providers\\LaravelExactOnlineServiceProvider"
-            ],
-            "aliases": {
-                "ExactOnline": "Websmurf\\LaravelExactOnline\\LaravelExactOnlineFacade"
-            }
-        }
+    {
+      "name": "Joshua de Gier",
+      "email": "info@pendo.nl"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Websmurf\\LaravelExactOnline\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Websmurf\\LaravelExactOnline\\Test\\": "tests"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Websmurf\\LaravelExactOnline\\Providers\\LaravelExactOnlineServiceProvider"
+      ],
+      "aliases": {
+        "ExactOnline": "Websmurf\\LaravelExactOnline\\LaravelExactOnlineFacade"
+      }
+    }
+  }
 }

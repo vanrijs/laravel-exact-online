@@ -2,7 +2,10 @@
 
 namespace Websmurf\LaravelExactOnline\Providers;
 
+use Exception;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\ServiceProvider;
+use Picqer\Financials\Exact\Connection;
 use Websmurf\LaravelExactOnline\LaravelExactOnline;
 
 class LaravelExactOnlineServiceProvider extends ServiceProvider
@@ -14,14 +17,14 @@ class LaravelExactOnlineServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadRoutesFrom(__DIR__.'/../Http/routes.php');
+        $this->loadRoutesFrom(__DIR__ . '/../Http/routes.php');
 
-        $this->loadViewsFrom(__DIR__.'/../views', 'laravelexactonline');
+        $this->loadViewsFrom(__DIR__ . '/../views', 'laravelexactonline');
 
         $this->publishes([
-            __DIR__.'/../views' => base_path('resources/views/vendor/laravelexactonline'),
-            __DIR__.'/../exact.api.json' => storage_path('exact.api.json'),
-            __DIR__.'/../config/laravel-exact-online.php' => config_path('laravel-exact-online.php')
+            __DIR__ . '/../views' => base_path('resources/views/vendor/laravelexactonline'),
+            __DIR__ . '/../exact.api.json' => storage_path('exact.api.json'),
+            __DIR__ . '/../config/laravel-exact-online.php' => config_path('laravel-exact-online.php')
         ]);
     }
 
@@ -34,10 +37,10 @@ class LaravelExactOnlineServiceProvider extends ServiceProvider
     {
         $this->app->alias(LaravelExactOnline::class, 'laravel-exact-online');
 
-        $this->app->singleton('Exact\Connection', function () {
+        $this->app->singleton('Exact\Connection', static function () {
             $config = LaravelExactOnline::loadConfig();
 
-            $connection = new \Picqer\Financials\Exact\Connection();
+            $connection = new Connection();
             $connection->setRedirectUrl(route('exact.callback'));
             $connection->setExactClientId(config('laravel-exact-online.exact_client_id'));
             $connection->setExactClientSecret(config('laravel-exact-online.exact_client_secret'));
@@ -69,12 +72,12 @@ class LaravelExactOnlineServiceProvider extends ServiceProvider
                 if (isset($config->exact_authorisationCode)) {
                     $connection->connect();
                 }
-            } catch (\GuzzleHttp\Exception\RequestException $e) {
+            } catch (RequestException $e) {
                 $connection->setAccessToken(null);
                 $connection->setRefreshToken(null);
                 $connection->connect();
-            } catch (\Exception $e) {
-                throw new \Exception('Could not connect to Exact: ' . $e->getMessage());
+            } catch (Exception $e) {
+                throw new Exception('Could not connect to Exact: ' . $e->getMessage());
             }
 
             $config->exact_accessToken = serialize($connection->getAccessToken());

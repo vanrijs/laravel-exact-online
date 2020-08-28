@@ -11,7 +11,8 @@ class LaravelExactOnlineController extends Controller
      * Connect Exact app
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function appConnect() {
+    public function appConnect()
+    {
         return view('laravelexactonline::connect');
     }
 
@@ -19,7 +20,8 @@ class LaravelExactOnlineController extends Controller
      * Authorize to Exact
      * Sends an oAuth request to the Exact App to get tokens
      */
-    public function appAuthorize() {
+    public function appAuthorize()
+    {
         $connection = app()->make('Exact\Connection');
         $connection->redirectForAuthorization();
     }
@@ -28,7 +30,8 @@ class LaravelExactOnlineController extends Controller
      * Exact Callback
      * Saves the authorisation and refresh tokens
      */
-    public function appCallback() {
+    public function appCallback()
+    {
         $config = LaravelExactOnline::loadConfig();
         $config->exact_authorisationCode = request()->get('code');
         LaravelExactOnline::storeConfig($config);
