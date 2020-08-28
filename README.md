@@ -17,14 +17,14 @@ what functions you may use.
 First add the dev-master version of this package to your composer.json
 
 ```
-"pendonl/laravel-exact-online": "dev-master"
+"Websmurf/laravel-exact-online": "dev-master"
 ```
 
 Then run `composer update` and add the Service Provider to config/app.php (For L5.5 and up Auto-Discovery is enabled)
 
 ```
 ...
-PendoNL\LaravelExactOnline\Providers\LaravelExactOnlineServiceProvider::class,
+Websmurf\LaravelExactOnline\Providers\LaravelExactOnlineServiceProvider::class,
 ...
 ```
 
@@ -32,14 +32,14 @@ In the same file, add the Facade
 
 ```
 ...
-'ExactOnline' => PendoNL\LaravelExactOnline\LaravelExactOnlineFacade::class,
+'ExactOnline' => Websmurf\LaravelExactOnline\LaravelExactOnlineFacade::class,
 ...
 ```
 
 Followed by this, publish the resources (views, config, etc.)
 
 ```
-php artisan vendor:publish --provider="PendoNL\LaravelExactOnline\Providers\LaravelExactOnlineServiceProvider"
+php artisan vendor:publish --provider="Websmurf\LaravelExactOnline\Providers\LaravelExactOnlineServiceProvider"
 ```
 
 While developing this package, you might want to use the `--force` flag on this command to overwrite previous files.
@@ -152,10 +152,7 @@ ExactOnline::connectionSetBaseUrl('http://start.exactonline.de')
 
 ## Security
 
-If you discover any security related issues, please email joshua@pendo.nl instead of using the issue tracker.
-
-## About Pendo
-Pendo is a webdevelopment agency based in Maastricht, Netherlands. If you'd like, you can [visit our website](https://pendo.nl).
+If you discover any security related issues, please email adam@bandhosting.nl instead of using the issue tracker.
 
 ## License
 

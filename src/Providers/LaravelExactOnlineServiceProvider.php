@@ -1,9 +1,9 @@
 <?php
 
-namespace PendoNL\LaravelExactOnline\Providers;
+namespace Websmurf\LaravelExactOnline\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use PendoNL\LaravelExactOnline\LaravelExactOnline;
+use Websmurf\LaravelExactOnline\LaravelExactOnline;
 
 class LaravelExactOnlineServiceProvider extends ServiceProvider
 {
