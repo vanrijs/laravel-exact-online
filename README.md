@@ -17,7 +17,7 @@ what functions you may use.
 First add the dev-master version of this package to your composer.json
 
 ```
-"Websmurf/laravel-exact-online": "dev-master"
+"websmurf/laravel-exact-online": "dev-master"
 ```
 
 Then run `composer update` and add the Service Provider to config/app.php (For L5.5 and up Auto-Discovery is enabled)
@@ -92,9 +92,9 @@ You may also edit the views to your liking, after publishing they can be found u
 `/views/vendor/laravel-exact-online/` in your resources path.
 
 ##### Step 1: connect & authorise
-Visit http://your-project.dev/exact/connect, you will be presented a submit button to go to
+Visit http://your-project.local/exact/connect, you will be presented a submit button to go to
 Exact Online. Once there, login and approve the app. After this you will be returned do 
-http://your-project.dev/exact/oauth, this route takes care of saving the needed tokens for
+http://your-project.local/exact/oauth, this route takes care of saving the needed tokens for
 future requests.
 
 ##### Step 2: use the Facade
@@ -119,15 +119,25 @@ $account = new Account($connection);
 dd($account->get());
 ```
 
-Using the Facade, we tried to make things easy, for instance getting a list of accounts:
+Using Dependency Injection, you can request an instance that already creates connection instance for you:
 
 ```php
-ExactOnline::Account()->get();
+function handle (\Websmurf\LaravelExactOnline\LaravelExactOnline $exactOnline) {
+    // List all accounts
+    $exactOnline->Account()->get();
+
+    // Get specific account:
+    $exactOnline->Account()->find('account_ID');
+}
 ```
 
-Or finding a specific account:
+Or if you prefer using the Facade, you can do that as well:
 
 ```php
+// List all accounts
+ExactOnline::Account()->get();
+
+// Get specific account:
 ExactOnline::Account()->find('account_ID');
 ```
 
@@ -135,12 +145,22 @@ All methods that change the connection are camelCased and prefixed with connecti
 example if you want to change the baseUrl of the API you would call:
 
 ```php
+$exactOnline->connectionSetBaseUrl('http://start.exactonline.de')
+
+// or:
+
 ExactOnline::connectionSetBaseUrl('http://start.exactonline.de');
 ```
 
 Of course everything is chainable for readability:
 
 ```php
+$exactOnline->connectionSetBaseUrl('http://start.exactonline.de')
+    ->Account()
+    ->find('account_ID')
+
+// or:
+
 ExactOnline::connectionSetBaseUrl('http://start.exactonline.de')
     ->Account()
     ->find('account_ID');
