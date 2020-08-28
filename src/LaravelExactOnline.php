@@ -354,6 +354,16 @@ class LaravelExactOnline
     }
 
     /**
+     * Return connection instance.
+     *
+     * @return Connection
+     */
+    public function connection()
+    {
+        return $this->connection;
+    }
+
+    /**
      * Function to handle the token update call from picqer.
      *
      * @param Connection $connection Connection instance.
