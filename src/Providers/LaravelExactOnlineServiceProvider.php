@@ -67,6 +67,8 @@ class LaravelExactOnlineServiceProvider extends ServiceProvider
             }
 
             $connection->setTokenUpdateCallback('\Websmurf\LaravelExactOnline\LaravelExactOnline::tokenUpdateCallback');
+            $connection->setAcquireAccessTokenLockCallback('\Websmurf\LaravelExactOnline\LaravelExactOnline::acquireLock');
+            $connection->setAcquireAccessTokenUnlockCallback('\Websmurf\LaravelExactOnline\LaravelExactOnline::releaseLock');
 
             try {
                 if (isset($config->exact_authorisationCode)) {
