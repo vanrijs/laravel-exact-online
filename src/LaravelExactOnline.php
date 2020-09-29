@@ -3,6 +3,7 @@
 namespace Websmurf\LaravelExactOnline;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Picqer\Financials\Exact\Connection;
@@ -313,7 +314,10 @@ use RuntimeException;
  */
 class LaravelExactOnline
 {
+    /** @var Connection */
     private $connection;
+    /** @var string */
+    private static $lockKey = 'exactonline.refreshLock';
 
     /**
      * LaravelExactOnline constructor.
@@ -328,14 +332,14 @@ class LaravelExactOnline
      *
      * @param string $method Name of the method that's called.
      * @param array $arguments Arguments passed to it.
-     * 
+     *
      * @return mixed
-     * 
+     *
      * @throws RuntimeException Throws a RuntimeException when the provided method does not exist.
      */
     public function __call($method, $arguments)
     {
-        if(strpos($method, "connection") === 0) {
+        if (strpos($method, "connection") === 0) {
             $method = lcfirst(substr($method, 10));
 
             call_user_func([$this->connection, $method], implode(",", $arguments));
@@ -346,7 +350,7 @@ class LaravelExactOnline
 
         $classname = "\\Picqer\\Financials\\Exact\\" . $method;
 
-        if(class_exists($classname) === false) {
+        if (class_exists($classname) === false) {
             throw new RuntimeException("Invalid type called");
         }
 
@@ -368,7 +372,8 @@ class LaravelExactOnline
      *
      * @param Connection $connection Connection instance.
      */
-    public static function tokenUpdateCallback (Connection $connection) {
+    public static function tokenUpdateCallback(Connection $connection)
+    {
         $config = self::loadConfig();
 
         $config->exact_accessToken = serialize($connection->getAccessToken());
@@ -379,13 +384,40 @@ class LaravelExactOnline
     }
 
     /**
+     * Acquire refresh lock to avoid duplicate calls to exact.
+     */
+    public static function acquireLock()
+    {
+        /** @var Repository $cache */
+        $cache = app()->make(Repository::class);
+
+        // See if lock was set already
+        if ($cache->get(self::$lockKey)) {
+            sleep(15); // Sleep for 15 seconds to avoid an invalid unlock
+            throw new RuntimeException('Exact online lock already set');
+        }
+
+        return $cache->set(self::$lockKey, 1, 15);
+    }
+
+    /**
+     * Release lock that was set.
+     */
+    public static function releaseLock()
+    {
+        /** @var Repository $cache */
+        $cache = app()->make(Repository::class);
+        return $cache->delete(self::$lockKey);
+    }
+
+    /**
      * Load existing configuration.
      *
      * @return Authenticatable|object
      */
     public static function loadConfig()
     {
-        if(config('laravel-exact-online.exact_multi_user')) {
+        if (config('laravel-exact-online.exact_multi_user')) {
             return Auth::user();
         }
 
@@ -407,7 +439,7 @@ class LaravelExactOnline
      */
     public static function storeConfig($config)
     {
-        if(config('laravel-exact-online.exact_multi_user')) {
+        if (config('laravel-exact-online.exact_multi_user')) {
             $config->save();
             return;
         }
