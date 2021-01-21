@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Picqer\Financials\Exact\Connection;
 use RuntimeException;
+use stdClass;
+use function json_decode;
+use function json_encode;
 
 /**
  * @method \Picqer\Financials\Exact\AbsenceRegistration AbsenceRegistration()
@@ -362,7 +365,7 @@ class LaravelExactOnline
      *
      * @return Connection
      */
-    public function connection()
+    public function connection(): Connection
     {
         return $this->connection;
     }
@@ -372,21 +375,41 @@ class LaravelExactOnline
      *
      * @param Connection $connection Connection instance.
      */
-    public static function tokenUpdateCallback(Connection $connection)
+    public static function tokenUpdateCallback(Connection $connection): void
     {
         $config = self::loadConfig();
 
         $config->exact_accessToken = serialize($connection->getAccessToken());
         $config->exact_refreshToken = $connection->getRefreshToken();
-        $config->exact_tokenExpires = $connection->getTokenExpires();
+        $config->exact_tokenExpires = $connection->getTokenExpires() - 60;
 
         self::storeConfig($config);
     }
 
     /**
+     * Function to handle the token refresh call from picqer.
+     *
+     * @param Connection $connection Connection instance.
+     */
+    public static function tokenRefreshCallback(Connection $connection): void
+    {
+        $config = self::loadConfig();
+
+        if (isset($config->exact_accessToken)) {
+            $connection->setAccessToken(unserialize($config->exact_accessToken));
+        }
+        if (isset($config->exact_refreshToken)) {
+            $connection->setRefreshToken($config->exact_refreshToken);
+        }
+        if (isset($config->exact_tokenExpires)) {
+            $connection->setTokenExpires($config->exact_tokenExpires);
+        }
+    }
+
+    /**
      * Acquire refresh lock to avoid duplicate calls to exact.
      */
-    public static function acquireLock()
+    public static function acquireLock(): bool
     {
         /** @var Repository $cache */
         $cache = app()->make(Repository::class);
@@ -403,7 +426,7 @@ class LaravelExactOnline
     /**
      * Release lock that was set.
      */
-    public static function releaseLock()
+    public static function releaseLock(): bool
     {
         /** @var Repository $cache */
         $cache = app()->make(Repository::class);
@@ -413,7 +436,7 @@ class LaravelExactOnline
     /**
      * Load existing configuration.
      *
-     * @return Authenticatable|object
+     * @return Authenticatable|stdClass
      */
     public static function loadConfig()
     {
@@ -435,9 +458,9 @@ class LaravelExactOnline
     /**
      * Store configuration changes.
      *
-     * @param Authenticatable|object $config
+     * @param Authenticatable|stdClass $config
      */
-    public static function storeConfig($config)
+    public static function storeConfig($config): void
     {
         if (config('laravel-exact-online.exact_multi_user')) {
             $config->save();

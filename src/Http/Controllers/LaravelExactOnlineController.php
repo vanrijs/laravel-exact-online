@@ -34,9 +34,17 @@ class LaravelExactOnlineController extends Controller
     {
         $config = LaravelExactOnline::loadConfig();
         $config->exact_authorisationCode = request()->get('code');
+
+        // Store first to avoid another redirect to exact online
         LaravelExactOnline::storeConfig($config);
 
         $connection = app()->make('Exact\Connection');
+
+        $config->exact_accessToken = serialize($connection->getAccessToken());
+        $config->exact_refreshToken = $connection->getRefreshToken();
+        $config->exact_tokenExpires = $connection->getTokenExpires() - 60;
+
+        LaravelExactOnline::storeConfig($config);
 
         return view('laravelexactonline::connected', ['connection' => $connection]);
     }
