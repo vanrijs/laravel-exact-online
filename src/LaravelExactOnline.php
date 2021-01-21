@@ -2,7 +2,9 @@
 
 namespace Websmurf\LaravelExactOnline;
 
+use Illuminate\Cache\Lock;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -319,8 +321,12 @@ class LaravelExactOnline
 {
     /** @var Connection */
     private $connection;
+
     /** @var string */
     private static $lockKey = 'exactonline.refreshLock';
+
+    /** @var null|Lock */
+    public static $lock = null;
 
     /**
      * LaravelExactOnline constructor.
@@ -413,24 +419,22 @@ class LaravelExactOnline
     {
         /** @var Repository $cache */
         $cache = app()->make(Repository::class);
+        $store = $cache->getStore();
 
-        // See if lock was set already
-        if ($cache->get(self::$lockKey)) {
-            sleep(15); // Sleep for 15 seconds to avoid an invalid unlock
-            throw new RuntimeException('Exact online lock already set');
+        if (!$store instanceof LockProvider) {
+            return false;
         }
 
-        return $cache->set(self::$lockKey, 1, 15);
+        self::$lock = $store->lock(self::$lockKey, 60);
+        return self::$lock->block(30);
     }
 
     /**
      * Release lock that was set.
      */
-    public static function releaseLock(): bool
+    public static function releaseLock()
     {
-        /** @var Repository $cache */
-        $cache = app()->make(Repository::class);
-        return $cache->delete(self::$lockKey);
+        return optional(self::$lock)->release();
     }
 
     /**
