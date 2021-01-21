@@ -2,8 +2,6 @@
 
 namespace Websmurf\LaravelExactOnline\Providers;
 
-use Exception;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\ServiceProvider;
 use Picqer\Financials\Exact\Connection;
 use Websmurf\LaravelExactOnline\LaravelExactOnline;
@@ -12,10 +10,8 @@ class LaravelExactOnlineServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->loadRoutesFrom(__DIR__ . '/../Http/routes.php');
 
@@ -30,10 +26,8 @@ class LaravelExactOnlineServiceProvider extends ServiceProvider
 
     /**
      * Register the application services.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->alias(LaravelExactOnline::class, 'laravel-exact-online');
 
@@ -54,39 +48,15 @@ class LaravelExactOnlineServiceProvider extends ServiceProvider
                 $connection->setAuthorizationCode($config->exact_authorisationCode);
             }
 
-            if (isset($config->exact_accessToken)) {
-                $connection->setAccessToken(unserialize($config->exact_accessToken));
-            }
+            // Init connection items (just as when the token is refreshed)
+            LaravelExactOnline::tokenRefreshCallback($connection);
 
-            if (isset($config->exact_refreshToken)) {
-                $connection->setRefreshToken($config->exact_refreshToken);
-            }
+            $connection->setTokenUpdateCallback([LaravelExactOnline::class, 'tokenUpdateCallback']);
+            $connection->setRefreshAccessTokenCallback([LaravelExactOnline::class, 'tokenRefreshCallback']);
+            $connection->setAcquireAccessTokenLockCallback([LaravelExactOnline::class, 'acquireLock']);
+            $connection->setAcquireAccessTokenUnlockCallback([LaravelExactOnline::class, 'releaseLock']);
 
-            if (isset($config->exact_tokenExpires)) {
-                $connection->setTokenExpires($config->exact_tokenExpires);
-            }
-
-            $connection->setTokenUpdateCallback('\Websmurf\LaravelExactOnline\LaravelExactOnline::tokenUpdateCallback');
-            $connection->setAcquireAccessTokenLockCallback('\Websmurf\LaravelExactOnline\LaravelExactOnline::acquireLock');
-            $connection->setAcquireAccessTokenUnlockCallback('\Websmurf\LaravelExactOnline\LaravelExactOnline::releaseLock');
-
-            try {
-                if (isset($config->exact_authorisationCode)) {
-                    $connection->connect();
-                }
-            } catch (RequestException $e) {
-                $connection->setAccessToken(null);
-                $connection->setRefreshToken(null);
-                $connection->connect();
-            } catch (Exception $e) {
-                throw new Exception('Could not connect to Exact: ' . $e->getMessage());
-            }
-
-            $config->exact_accessToken = serialize($connection->getAccessToken());
-            $config->exact_refreshToken = $connection->getRefreshToken();
-            $config->exact_tokenExpires = $connection->getTokenExpires();
-
-            LaravelExactOnline::storeConfig($config);
+            $connection->connect();
 
             return $connection;
         });
