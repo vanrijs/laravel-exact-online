@@ -333,7 +333,6 @@ class LaravelExactOnline
      */
     public function __construct()
     {
-        $this->connection = app()->make('Exact\Connection');
     }
 
     /**
@@ -351,7 +350,7 @@ class LaravelExactOnline
         if (strpos($method, "connection") === 0) {
             $method = lcfirst(substr($method, 10));
 
-            call_user_func([$this->connection, $method], implode(",", $arguments));
+            call_user_func([$this->connection(), $method], implode(",", $arguments));
 
             return $this;
 
@@ -363,7 +362,7 @@ class LaravelExactOnline
             throw new RuntimeException("Invalid type called");
         }
 
-        return new $classname($this->connection);
+        return new $classname($this->connection());
     }
 
     /**
@@ -373,6 +372,9 @@ class LaravelExactOnline
      */
     public function connection(): Connection
     {
+        if (!$this->connection) {
+            $this->connection = app()->make('Exact\Connection');
+        }
         return $this->connection;
     }
 
