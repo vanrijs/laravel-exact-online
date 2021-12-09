@@ -2,7 +2,7 @@
 
 namespace Websmurf\LaravelExactOnline;
 
-use Illuminate\Cache\Lock;
+use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository;
