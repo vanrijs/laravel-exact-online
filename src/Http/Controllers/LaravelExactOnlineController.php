@@ -2,14 +2,17 @@
 
 namespace Websmurf\LaravelExactOnline\Http\Controllers;
 
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Routing\Controller;
+use Illuminate\View\View;
 use Websmurf\LaravelExactOnline\LaravelExactOnline;
 
 class LaravelExactOnlineController extends Controller
 {
     /**
      * Connect Exact app
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     *
+     * @return Factory|View
      */
     public function appConnect()
     {
@@ -17,10 +20,10 @@ class LaravelExactOnlineController extends Controller
     }
 
     /**
-     * Authorize to Exact
+     * Authorize to ExactOnline
      * Sends an oAuth request to the Exact App to get tokens
      */
-    public function appAuthorize()
+    public function appAuthorize(): void
     {
         $connection = app()->make('Exact\Connection');
         $connection->redirectForAuthorization();
@@ -29,6 +32,8 @@ class LaravelExactOnlineController extends Controller
     /**
      * Exact Callback
      * Saves the authorisation and refresh tokens
+     *
+     * @return Factory|View
      */
     public function appCallback()
     {
