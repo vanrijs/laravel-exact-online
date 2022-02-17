@@ -458,7 +458,7 @@ class LaravelExactOnline
             );
         }
 
-        return (object)json_decode($config, false);
+        return (object) json_decode($config, false);
     }
 
     /**
