@@ -2,8 +2,8 @@
 
 namespace Websmurf\LaravelExactOnline;
 
-use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +15,8 @@ use function json_decode;
 use function json_encode;
 
 /**
+ * @package Websmurf\LaravelExactOnline
+ *
  * @method \Picqer\Financials\Exact\AbsenceRegistration AbsenceRegistration(array $attributes = [])
  * @method \Picqer\Financials\Exact\AbsenceRegistrationTransaction AbsenceRegistrationTransaction(array $attributes = [])
  * @method \Picqer\Financials\Exact\AcceptQuotation AcceptQuotation(array $attributes = [])
@@ -314,68 +316,24 @@ use function json_encode;
  * @method self setTokenUrl(string $tokenUrl)
  *
  * Class LaravelExactOnline
- *
- * @package Websmurf\LaravelExactOnline
  */
 class LaravelExactOnline
 {
+    /** @var null|Lock */
+    public static $lock = null;
+
     /** @var Connection */
     private $connection;
 
     /** @var string */
     private static $lockKey = 'exactonline.refreshLock';
 
-    /** @var null|Lock */
-    public static $lock = null;
-
-    /**
-     * LaravelExactOnline constructor.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
-     * Magically calls methods from Picqer Exact Online API
-     *
-     * @param string $method Name of the method that's called.
-     * @param array $arguments Arguments passed to it.
-     *
-     * @return mixed
-     *
-     * @throws RuntimeException Throws a RuntimeException when the provided method does not exist.
-     */
-    public function __call($method, $arguments)
-    {
-        if (strpos($method, "connection") === 0) {
-            $method = lcfirst(substr($method, 10));
-
-            call_user_func([$this->connection(), $method], implode(",", $arguments));
-
-            return $this;
-
-        }
-
-        $classname = "\\Picqer\\Financials\\Exact\\" . $method;
-
-        if (class_exists($classname) === false) {
-            throw new RuntimeException("Invalid type called");
-        }
-
-        // Extract attributes to pass to the model instance.
-        $attributes = count($arguments) !== 0 ? $arguments[0] : [];
-
-        return new $classname($this->connection(), $attributes);
-    }
-
     /**
      * Return connection instance.
-     *
-     * @return Connection
      */
     public function connection(): Connection
     {
-        if (!$this->connection) {
+        if (! $this->connection) {
             $this->connection = app()->make('Exact\Connection');
         }
         return $this->connection;
@@ -426,7 +384,7 @@ class LaravelExactOnline
         $cache = app()->make(Repository::class);
         $store = $cache->getStore();
 
-        if (!$store instanceof LockProvider) {
+        if (! $store instanceof LockProvider) {
             return false;
         }
 
@@ -436,6 +394,8 @@ class LaravelExactOnline
 
     /**
      * Release lock that was set.
+     *
+     * @return bool
      */
     public static function releaseLock()
     {
@@ -457,7 +417,7 @@ class LaravelExactOnline
 
         if (Storage::exists('exact.api.json')) {
             $config = Storage::get(
-                'exact.api.json'
+                'exact.api.json',
             );
         }
 
@@ -477,5 +437,37 @@ class LaravelExactOnline
         }
 
         Storage::put('exact.api.json', json_encode($config));
+    }
+
+    /**
+     * Magically calls methods from Picqer Exact Online API
+     *
+     * @param string $method Name of the method that's called.
+     * @param array $arguments Arguments passed to it.
+     *
+     * @return mixed
+     *
+     * @throws RuntimeException Throws a RuntimeException when the provided method does not exist.
+     */
+    public function __call($method, $arguments)
+    {
+        if (strpos($method, "connection") === 0) {
+            $method = lcfirst(substr($method, 10));
+
+            call_user_func([$this->connection(), $method], implode(",", $arguments));
+
+            return $this;
+        }
+
+        $classname = "\\Picqer\\Financials\\Exact\\" . $method;
+
+        if (class_exists($classname) === false) {
+            throw new RuntimeException("Invalid type called");
+        }
+
+        // Extract attributes to pass to the model instance.
+        $attributes = count($arguments) !== 0 ? $arguments[0] : [];
+
+        return new $classname($this->connection(), $attributes);
     }
 }
