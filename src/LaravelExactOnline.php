@@ -345,7 +345,7 @@ class LaravelExactOnline
      *
      * @throws RuntimeException Throws a RuntimeException when the provided method does not exist.
      */
-    public function __call($method, $arguments)
+    public function __call(string $method, array $arguments = [])
     {
         if (strpos($method, "connection") === 0) {
             $method = lcfirst(substr($method, 10));
@@ -362,7 +362,10 @@ class LaravelExactOnline
             throw new RuntimeException("Invalid type called");
         }
 
-        return empty($arguments) ? new $classname($this->connection()) : new $classname($this->connection(), $arguments[0]);
+        // Extract attributes to pass to the model instance.
+        $attributes = count($arguments) !== 0 ? $arguments[0] : [];
+
+        return new $classname($this->connection(), $attributes);
     }
 
     /**
