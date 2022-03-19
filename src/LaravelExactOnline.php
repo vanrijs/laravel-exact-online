@@ -350,7 +350,7 @@ class LaravelExactOnline
 
         $config->exact_accessToken = serialize($connection->getAccessToken());
         $config->exact_refreshToken = $connection->getRefreshToken();
-        $config->exact_tokenExpires = $connection->getTokenExpires() - 60;
+        $config->exact_tokenExpires = $connection->getTokenExpires();
 
         self::storeConfig($config);
     }
