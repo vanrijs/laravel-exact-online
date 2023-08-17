@@ -328,6 +328,8 @@ class LaravelExactOnline
     /** @var string */
     private static $lockKey = 'exactonline.refreshLock';
 
+    private static $json_filename = 'exact.api.json';
+
     /**
      * Return connection instance.
      */
@@ -415,9 +417,9 @@ class LaravelExactOnline
 
         $config = '{}';
 
-        if (Storage::exists(config('laravel-exact-online.exact_json_filename'))) {
+        if (Storage::exists(config('laravel-exact-online.exact_json_filename', self::$json_filename))) {
             $config = Storage::get(
-                config('laravel-exact-online.exact_json_filename'),
+                config('laravel-exact-online.exact_json_filename', self::$json_filename),
             );
         }
 
@@ -436,7 +438,7 @@ class LaravelExactOnline
             return;
         }
 
-        Storage::put(config('laravel-exact-online.exact_json_filename'), json_encode($config));
+        Storage::put(config('laravel-exact-online.exact_json_filename', self::$json_filename), json_encode($config));
     }
 
     /**
