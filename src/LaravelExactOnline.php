@@ -415,9 +415,9 @@ class LaravelExactOnline
 
         $config = '{}';
 
-        if (Storage::exists('exact.api.json')) {
+        if (Storage::exists(config('laravel-exact-online.exact_json_filename'))) {
             $config = Storage::get(
-                'exact.api.json',
+                config('laravel-exact-online.exact_json_filename'),
             );
         }
 
@@ -436,7 +436,7 @@ class LaravelExactOnline
             return;
         }
 
-        Storage::put('exact.api.json', json_encode($config));
+        Storage::put(config('laravel-exact-online.exact_json_filename'), json_encode($config));
     }
 
     /**

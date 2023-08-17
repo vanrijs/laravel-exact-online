@@ -19,7 +19,7 @@ class LaravelExactOnlineServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__ . '/../views' => base_path('resources/views/vendor/laravelexactonline'),
-            __DIR__ . '/../exact.api.json' => storage_path('exact.api.json'),
+            //__DIR__ . '/../exact.api.json' => storage_path('exact.api.json'),
             __DIR__ . '/../config/laravel-exact-online.php' => config_path('laravel-exact-online.php'),
         ]);
     }

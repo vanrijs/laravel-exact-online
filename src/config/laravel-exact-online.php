@@ -23,7 +23,13 @@ return [
     'exact_country_code' => env('EXACT_COUNTRY_CODE', 'nl'),
 
     /**
-     * The Client country code
+     * Exact multi user
      */
     'exact_multi_user' => env('EXACT_MULTI_USER', false),
+
+    /**
+     * Exact api json file name
+     */
+    'exact_json_filename' => env('EXACT_JSON_FILENAME', 'exact.api.json')
+
 ];
